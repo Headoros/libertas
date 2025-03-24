@@ -1,0 +1,67 @@
+services:
+  gateway:
+    build:
+      context: ./EventService
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Gateway:/app
+    command: npm start
+  event-service:
+    build:
+      context: ./EventService
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./EventService:/app
+    environment:
+      NODE_ENV: development
+      DB_HOST: event-database
+      DB_USER: postgres
+      DB_PASSWORD: mysecretpassword
+      DB_NAME: events_db
+    command: npm run dev
+    depends_on:
+      - gateway
+      - rabbitmq
+      - event-database
+  notification-service:
+    build:
+      context: ./NotificationService
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./NotificationService:/app
+    environment:
+      NODE_ENV: development
+      DB_HOST: notification-database
+      DB_USER: postgres
+      DB_PASSWORD: mysecretpassword
+      DB_NAME: notifications_db
+    command: npm run dev
+    depends_on:
+      - gateway
+      - rabbitmq
+      - notification-database
+  rabbitmq:
+    image: "rabbitmq"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  event-database:
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: events_db
+  notification-database:
+    image: "postgres"
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: notifications_db

@@ -1,0 +1,47 @@
+http:
+  port: 8080
+admin:
+  port: 9876
+  host: 0.0.0.0
+apiEndpoints:
+  events:
+    paths: ["/events", "/events/*"]
+  notifications:
+    paths: ["/notifications", "/notifications/*"]
+serviceEndpoints:
+  eventService:
+    url: "http://event-service:3001"
+  notificationService:
+    url: "http://notification-service:3002"
+policies:
+  - basic-auth
+  - cors
+  - expression
+  - key-auth
+  - log
+  - oauth2
+  - proxy
+  - rate-limit
+pipelines:
+  events:
+    apiEndpoints:
+      - events
+    policies:
+      - proxy:
+          action:
+            serviceEndpoint: eventService
+            changeOrigin: true
+            prependPath: true
+            ignorePath: false
+            stripPath: false
+  notifications:
+    apiEndpoints:
+      - notifications
+    policies:
+      - proxy:
+          action:
+            serviceEndpoint: notificationService
+            changeOrigin: true
+            prependPath: true
+            ignorePath: false
+            stripPath: false
