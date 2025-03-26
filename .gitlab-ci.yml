@@ -1,0 +1,14 @@
+stages:
+  - build_and_push
+
+build_and_push:
+  stage: build_and_push
+  tags:
+    - your-self-hosted-runner-tag # Replace with your runner tag
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker-compose build
+    - docker tag your-express-service-name:latest "$CI_REGISTRY_IMAGE/your-express-service-name:$CI_COMMIT_SHORT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE/your-express-service-name:$CI_COMMIT_SHORT_SHA"
+  only:
+    - master
