@@ -9,6 +9,7 @@ build_and_push:
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
   script:
+    - docker info
     - docker-compose build
     - docker tag your-express-service-name:latest "$CI_REGISTRY_IMAGE/your-express-service-name:$CI_COMMIT_SHORT_SHA"
     - docker push "$CI_REGISTRY_IMAGE/your-express-service-name:$CI_COMMIT_SHORT_SHA"
