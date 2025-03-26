@@ -2,12 +2,12 @@ stages:
   - build_and_push
 
 build_and_push:
+  image: docker:latest
+  services: 
+    - docker:dind
   stage: build_and_push
-  tags:
-    - docker
   before_script:
-    - docker info
-    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
   script:
     - docker-compose build
     - docker tag your-express-service-name:latest "$CI_REGISTRY_IMAGE/your-express-service-name:$CI_COMMIT_SHORT_SHA"
