@@ -3,6 +3,8 @@ stages:
 
 build_and_push:
   image: docker:latest
+  services: 
+    - docker:dind
   stage: build_and_push
   tags:
     - docker
