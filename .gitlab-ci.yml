@@ -67,12 +67,6 @@ deploy_to_kubernetes:
   script: |
     echo "Deploying image: docker_compose:${CI_COMMIT_SHORT_SHA}"
 
-    if command -v yq >/dev/null 2>&1; then
-      yq -i ".spec.template.spec.containers[0].image = \"${IMAGE_NAME}:${IMAGE_TAG}\"" deployment.yaml
-    else
-      sed -i 's#image:.*#image: '"${IMAGE_NAME}:${IMAGE_TAG}"'#' deployment.yaml
-    fi
-
     # Apply Kubernetes configs
     kubectl apply -f event-service-deployment.yaml -n "default"
     kubectl apply -f event-service-service.yaml -n "default"
