@@ -1,5 +1,6 @@
 stages:
   - build_and_push
+  - deploy_to_kubernetes
 
 build_and_push:
   image: docker:latest
@@ -11,7 +12,16 @@ build_and_push:
   script:
     - docker info
     - docker-compose build
-    # - docker tag your-express-service-name:latest "$CI_REGISTRY_IMAGE/your-express-service-name:$CI_COMMIT_SHORT_SHA"
-    # - docker push "$CI_REGISTRY_IMAGE/your-express-service-name:$CI_COMMIT_SHORT_SHA"
+  only:
+    - master
+
+deploy_to_kubernetes:
+  image: kubectl:latest
+  stage: deploy_to_kubernetes
+  before_script:
+    - mkdir -p ~/.kube
+    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
+  script:
+    - kubectl apply -f gateway-service.yaml
   only:
     - master
