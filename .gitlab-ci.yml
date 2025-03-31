@@ -41,8 +41,6 @@ build_and_push:
     - docker push $DOCKER_IMAGE:latest
   only:
     - master
-  tags:
-    - docker
 
 deploy_to_kubernetes:
   stage: deploy_to_kubernetes
@@ -68,8 +66,6 @@ deploy_to_kubernetes:
     kubectl apply -f kubernetes -n "default"
   only:
     - master
-  tags:
-    - kubernetes
 
 # deploy_to_kubernetes:
 #   image: alpine:latest
