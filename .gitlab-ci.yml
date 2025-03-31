@@ -24,6 +24,10 @@ stages:
 #     reports:
 #       junit: app/junit.xml
 
+variables:
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+
 build_and_push:
   image: docker:latest
   services: 
@@ -34,28 +38,10 @@ build_and_push:
   script:
     - docker info
     - docker-compose build
-    - docker tag docker_compose:$CI_COMMIT_SHORT_SHA $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:docker_compose
-    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:docker_compose
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
+    - docker push $CONTAINER_RELEASE_IMAGE
   only:
     - master
-
-# deploy_to_kubernetes:
-#   image: alpine:latest
-#   stage: deploy_to_kubernetes
-#   before_script:
-#     - apk add --no-cache curl bash
-#     - apk add --no-cache kubectl # Install kubectl in alpine
-#     - mkdir -p ~/.kube
-#     - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config # Add your kubeconfig as a CI/CD variable.
-#   script:
-#     - kubectl apply -f kubernetes/deployment.yaml # Deploy your deployment, service etc.
-#     # Optionally:
-#     # - kubectl rollout restart deployment <deployment-name>
-#     # - kubectl get pods
-#   variables:
-#     KUBE_CONFIG: $KUBE_CONFIG # Ensure this variable is set in your CI/CD variables.
-#   only:
-#     - master
 
 deploy_to_kubernetes:
   stage: deploy_to_kubernetes
@@ -80,4 +66,22 @@ deploy_to_kubernetes:
     # Apply Kubernetes configs
     kubectl apply -f kubernetes -n "default"
   only:
-    - main
+    - master
+
+# deploy_to_kubernetes:
+#   image: alpine:latest
+#   stage: deploy_to_kubernetes
+#   before_script:
+#     - apk add --no-cache curl bash
+#     - apk add --no-cache kubectl # Install kubectl in alpine
+#     - mkdir -p ~/.kube
+#     - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config # Add your kubeconfig as a CI/CD variable.
+#   script:
+#     - kubectl apply -f kubernetes/deployment.yaml # Deploy your deployment, service etc.
+#     # Optionally:
+#     # - kubectl rollout restart deployment <deployment-name>
+#     # - kubectl get pods
+#   variables:
+#     KUBE_CONFIG: $KUBE_CONFIG # Ensure this variable is set in your CI/CD variables.
+#   only:
+#     - master
