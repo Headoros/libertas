@@ -1,5 +1,6 @@
 stages:
   # - test
+  - build_to_dockerhub
   - build_and_push
   - deploy_to_kubernetes
 
@@ -41,6 +42,18 @@ build_and_push:
   only:
     - master
 
+build_to_dockerhub:
+  stage: build_to_dockerhub
+  image: docker:20.10
+  services:
+    - docker:20.10-dind
+  script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+    - docker-compose build
+    - docker compose push
+  only:
+    - master
+
 deploy_to_kubernetes:
   stage: deploy_to_kubernetes
   image:
@@ -55,7 +68,8 @@ deploy_to_kubernetes:
     echo "Deploying image: docker_compose:${CI_COMMIT_SHORT_SHA}"
 
     # Apply Kubernetes configs
-    kubectl apply -f gateway-service.yaml -n "default"
+    kubectl apply -f event-service-deployment.yaml -n "default"
+    kubectl apply -f event-service-service.yaml -n "default"
   only:
     - master
 
