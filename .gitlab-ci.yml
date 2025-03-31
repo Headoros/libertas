@@ -25,8 +25,7 @@ stages:
 #       junit: app/junit.xml
 
 variables:
-  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+  DOCKER_IMAGE: $CI_REGISTRY/$CI_PROJECT_PATH
 
 build_and_push:
   image: docker:latest
@@ -38,10 +37,12 @@ build_and_push:
   script:
     - docker info
     - docker-compose build
-    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker push $CONTAINER_RELEASE_IMAGE
+    - docker push $DOCKER_IMAGE:$CI_COMMIT_SHA
+    - docker push $DOCKER_IMAGE:latest
   only:
     - master
+  tags:
+    - docker
 
 deploy_to_kubernetes:
   stage: deploy_to_kubernetes
@@ -67,6 +68,8 @@ deploy_to_kubernetes:
     kubectl apply -f kubernetes -n "default"
   only:
     - master
+  tags:
+    - kubernetes
 
 # deploy_to_kubernetes:
 #   image: alpine:latest
