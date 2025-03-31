@@ -27,6 +27,8 @@ stages:
 
 variables:
   DOCKER_IMAGE: $CI_REGISTRY/$CI_PROJECT_PATH
+  IMAGE_NAME: "mikeyspikey/event-service"
+  IMAGE_TAG: "$CI_COMMIT_SHA"
 
 build_and_push:
   image: docker:latest
@@ -49,8 +51,8 @@ build_to_dockerhub:
     - docker:20.10-dind
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
-    - docker-compose build
-    - docker compose push
+    - docker build -t "$IMAGE_NAME:$IMAGE_TAG" .
+    - docker push "$IMAGE_NAME:$IMAGE_TAG"
   only:
     - master
 
