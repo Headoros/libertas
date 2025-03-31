@@ -1,6 +1,28 @@
 stages:
+  # - test
   - build_and_push
   - deploy_to_kubernetes
+
+# run_unit_test:
+#   stage: test
+#   image: node:22-alpine
+#   cache:
+#     key: "$CI_COMMIT_REF_NAME"
+#     paths:
+#       - app/node_modules
+#   tags:
+#     - docker
+#   before_script:
+#     - cd app
+#     - npm install
+#   script:
+#     - npm test
+#   artifacts:
+#     when: always 
+#     paths:
+#       - app/junit.xml
+#     reports:
+#       junit: app/junit.xml
 
 build_and_push:
   image: docker:latest
@@ -12,16 +34,50 @@ build_and_push:
   script:
     - docker info
     - docker-compose build
+    - docker tag docker_compose:$CI_COMMIT_SHORT_SHA $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:docker_compose
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:docker_compose
   only:
     - master
 
+# deploy_to_kubernetes:
+#   image: alpine:latest
+#   stage: deploy_to_kubernetes
+#   before_script:
+#     - apk add --no-cache curl bash
+#     - apk add --no-cache kubectl # Install kubectl in alpine
+#     - mkdir -p ~/.kube
+#     - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config # Add your kubeconfig as a CI/CD variable.
+#   script:
+#     - kubectl apply -f kubernetes/deployment.yaml # Deploy your deployment, service etc.
+#     # Optionally:
+#     # - kubectl rollout restart deployment <deployment-name>
+#     # - kubectl get pods
+#   variables:
+#     KUBE_CONFIG: $KUBE_CONFIG # Ensure this variable is set in your CI/CD variables.
+#   only:
+#     - master
+
 deploy_to_kubernetes:
-  image: kubectl:latest
   stage: deploy_to_kubernetes
+  image:
+    name: alpine/k8s:1.28.0
+    entrypoint: ["/bin/sh", "-c"]
   before_script:
-    - mkdir -p ~/.kube
-    - echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config
-  script:
-    - kubectl apply -f gateway-service.yaml
+    - apk add --no-cache yq
+    - mkdir -p $HOME/.kube
+    - echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
+    - export KUBECONFIG="$HOME/.kube/config"
+  script: |
+    echo "Deploying image: docker_compose:${CI_COMMIT_SHORT_SHA}"
+
+    # # Update image in deployment.yaml
+    # if command -v yq >/dev/null 2>&1; then
+    #   yq -i ".spec.template.spec.containers[0].image = \"${IMAGE_NAME}:${IMAGE_TAG}\"" deployment.yaml
+    # else
+    #   sed -i 's#image:.*#image: '"${IMAGE_NAME}:${IMAGE_TAG}"'#' deployment.yaml
+    # fi
+
+    # Apply Kubernetes configs
+    kubectl apply -f kubernetes -n "default"
   only:
-    - master
+    - main
