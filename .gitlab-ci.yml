@@ -37,8 +37,8 @@ build_and_push:
   script:
     - docker info
     - docker-compose build
-    - docker push $(echo $DOCKER_IMAGE | tr '[:upper:]' '[:lower:]'):$CI_COMMIT_SHA
-    - docker push $(echo $DOCKER_IMAGE | tr '[:upper:]' '[:lower:]'):latest
+    - docker push "$(echo $DOCKER_IMAGE | tr '[:upper:]' '[:lower:]'):${CI_COMMIT_SHA}"
+    - docker push "$(echo $DOCKER_IMAGE | tr '[:upper:]' '[:lower:]'):latest"
   only:
     - master
 
