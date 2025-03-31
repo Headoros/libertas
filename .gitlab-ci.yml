@@ -65,9 +65,6 @@ deploy_to_kubernetes:
     - echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
     - export KUBECONFIG="$HOME/.kube/config"
   script: |
-    echo "Deploying image: docker_compose:${CI_COMMIT_SHORT_SHA}"
-
-    # Apply Kubernetes configs
     kubectl apply -f event-service-deployment.yaml -n "default"
     kubectl apply -f event-service-service.yaml -n "default"
   only:
