@@ -3,6 +3,7 @@ services:
     build:
       context: ./EventService
       dockerfile: Dockerfile
+    image: mikeyspikey/gateway:latest
     ports:
       - "8080:8080"
     volumes:
@@ -12,6 +13,7 @@ services:
     build:
       context: ./EventService
       dockerfile: Dockerfile
+    image: mikeyspikey/event-service:latest
     ports:
       - "3001:3001"
     volumes:
@@ -31,6 +33,7 @@ services:
     build:
       context: ./NotificationService
       dockerfile: Dockerfile
+    image: mikeyspikey/notification-service:latest
     ports:
       - "3002:3002"
     volumes:
