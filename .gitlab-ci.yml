@@ -54,15 +54,8 @@ deploy_to_kubernetes:
   script: |
     echo "Deploying image: docker_compose:${CI_COMMIT_SHORT_SHA}"
 
-    # # Update image in deployment.yaml
-    # if command -v yq >/dev/null 2>&1; then
-    #   yq -i ".spec.template.spec.containers[0].image = \"${IMAGE_NAME}:${IMAGE_TAG}\"" deployment.yaml
-    # else
-    #   sed -i 's#image:.*#image: '"${IMAGE_NAME}:${IMAGE_TAG}"'#' deployment.yaml
-    # fi
-
     # Apply Kubernetes configs
-    kubectl apply -f kubernetes -n "default"
+    kubectl apply -f gateway-service.yaml -n "default"
   only:
     - master
 
