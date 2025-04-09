@@ -1,5 +1,5 @@
 http:
-  port: 8080
+  port: 8081
 admin:
   port: 9876
   host: 0.0.0.0
@@ -7,12 +7,16 @@ apiEndpoints:
   events:
     paths: ["/events", "/events/*"]
   notifications:
-    paths: ["/notifications", "/notifications/*"]
+    paths: ["/notifications", "/notifications/*", "/SSE"]
+  users:
+    paths: ["/users", "/users/*"]
 serviceEndpoints:
   eventService:
     url: "http://event-service:3001"
   notificationService:
     url: "http://notification-service:3002"
+  userService:
+    url: "http://user-service:3003"
 policies:
   - basic-auth
   - cors
@@ -34,6 +38,21 @@ pipelines:
             prependPath: true
             ignorePath: false
             stripPath: false
+            loadBalance:
+                type: round-robin
+  users:
+    apiEndpoints:
+      - users
+    policies:
+      - proxy:
+          action:
+            serviceEndpoint: userService
+            changeOrigin: true
+            prependPath: true
+            ignorePath: false
+            stripPath: false
+            loadBalance:
+                type: round-robin
   notifications:
     apiEndpoints:
       - notifications
@@ -45,3 +64,5 @@ pipelines:
             prependPath: true
             ignorePath: false
             stripPath: false
+            loadBalance:
+                type: round-robin

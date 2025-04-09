@@ -1,11 +1,8 @@
 services:
   gateway:
-    build:
-      context: ./EventService
-      dockerfile: Dockerfile
     image: mikeyspikey/gateway:latest
     ports:
-      - "8080:8080"
+      - "8081:8081"
     volumes:
       - ./Gateway:/app
     command: npm start
@@ -14,8 +11,6 @@ services:
       context: ./EventService
       dockerfile: Dockerfile
     image: mikeyspikey/event-service:latest
-    ports:
-      - "3001:3001"
     volumes:
       - ./EventService:/app
     environment:
@@ -29,13 +24,33 @@ services:
       - gateway
       - rabbitmq
       - event-database
+    deploy:
+      replicas: 3
+  user-service:
+      build:
+        context: ./UserService
+        dockerfile: Dockerfile
+      image: mikeyspikey/user-service:latest
+      volumes:
+        - ./UserService:/app
+      environment:
+        NODE_ENV: development
+        DB_HOST: user-database
+        DB_USER: postgres
+        DB_PASSWORD: mysecretpassword
+        DB_NAME: users_db
+      command: npm run dev
+      depends_on:
+        - gateway
+        - rabbitmq
+        - user-database
+      deploy:
+        replicas: 1
   notification-service:
     build:
       context: ./NotificationService
       dockerfile: Dockerfile
     image: mikeyspikey/notification-service:latest
-    ports:
-      - "3002:3002"
     volumes:
       - ./NotificationService:/app
     environment:
@@ -49,6 +64,8 @@ services:
       - gateway
       - rabbitmq
       - notification-database
+    deploy:
+      replicas: 3
   rabbitmq:
     image: "rabbitmq"
     ports:
@@ -68,3 +85,10 @@ services:
     environment:
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: notifications_db
+  user-database:
+      image: "postgres"
+      ports:
+        - "5434:5432"
+      environment:
+        POSTGRES_PASSWORD: mysecretpassword
+        POSTGRES_DB: users_db
