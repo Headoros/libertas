@@ -1,0 +1,104 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main # Assuming 'master' in your GitLab CI corresponds to 'main' in GitHub
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Unit Tests (commented out as per your request)
+  # test:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: node:22-alpine
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Set up cache
+  #       uses: actions/cache@v3
+  #       with:
+  #         path: app/node_modules
+  #         key: ${{ runner.os }}-${{ hashFiles('app/package-lock.json') }}
+  #     - name: Install dependencies
+  #       working-directory: app
+  #       run: npm install
+  #     - name: Run unit tests
+  #       working-directory: app
+  #       run: npm test
+  #     - name: Upload test report
+  #       uses: actions/upload-artifact@v3
+  #       if: always()
+  #       with:
+  #         name: junit-report
+  #         path: app/junit.xml
+
+  build_to_dockerhub:
+    needs: # No explicit dependency as it can run in parallel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and Push Docker images to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker-compose.yml # Assuming your docker-compose.yml is in the root
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:${{ github.sha }}
+        if: github.ref == 'refs/heads/main'
+
+  build_and_push:
+    needs: # No explicit dependency as it can run in parallel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and Push Docker images to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker-compose.yml # Assuming your docker-compose.yml is in the root
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
+        if: github.ref == 'refs/heads/main'
+
+  deploy_to_kubernetes:
+    needs: [build_and_push] # Ensure build_and_push completes before deploying
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0' # Match your desired Kubernetes version
+      - name: Configure Kubernetes
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+      - name: Deploy to Kubernetes
+        env:
+          IMAGE_TAG: ghcr.io/${{ github.repository }}:${{ github.sha }}
+        run: |
+          echo "Deploying image: $IMAGE_TAG"
+          # Apply Kubernetes configurations (adjust paths as needed)
+          kubectl apply -f event-service-deployment.yaml -n "default"
+          kubectl apply -f event-service-service.yaml -n "default"
+        if: github.ref == 'refs/heads/main'
