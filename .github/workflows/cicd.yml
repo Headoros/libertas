@@ -3,10 +3,10 @@ name: CI/CD
 on:
   push:
     branches:
-      - main # Assuming 'master' in your GitLab CI corresponds to 'main' in GitHub
+      - development
   pull_request:
     branches:
-      - main
+      - development
 
 jobs:
   # Unit Tests (commented out as per your request)
