@@ -9,33 +9,7 @@ on:
       - development
 
 jobs:
-  # Unit Tests (commented out as per your request)
-  # test:
-  #   runs-on: ubuntu-latest
-  #   container:
-  #     image: node:22-alpine
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Set up cache
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: app/node_modules
-  #         key: ${{ runner.os }}-${{ hashFiles('app/package-lock.json') }}
-  #     - name: Install dependencies
-  #       working-directory: app
-  #       run: npm install
-  #     - name: Run unit tests
-  #       working-directory: app
-  #       run: npm test
-  #     - name: Upload test report
-  #       uses: actions/upload-artifact@v3
-  #       if: always()
-  #       with:
-  #         name: junit-report
-  #         path: app/junit.xml
-
   build_to_dockerhub:
-    needs: # No explicit dependency as it can run in parallel
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -58,7 +32,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
 
   build_and_push:
-    needs: # No explicit dependency as it can run in parallel
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -75,20 +48,20 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker-compose.yml # Assuming your docker-compose.yml is in the root
+          file: ./docker-compose.yml
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
         if: github.ref == 'refs/heads/main'
 
   deploy_to_kubernetes:
-    needs: [build_and_push] # Ensure build_and_push completes before deploying
+    needs: [build_and_push]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
-          version: 'v1.28.0' # Match your desired Kubernetes version
+          version: 'v1.28.0'
       - name: Configure Kubernetes
         run: |
           mkdir -p ~/.kube
