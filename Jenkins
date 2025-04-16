@@ -31,5 +31,11 @@ pipeline {
                 echo 'Save the assemblies generated from the compilation' 
             }
         }
+        stage('Deploy to Test Environment') {
+            steps {
+                echo 'Deploying to the test environment using Docker Compose'
+                sh 'docker compose up -d'
+            }
+        }
     }
 }
