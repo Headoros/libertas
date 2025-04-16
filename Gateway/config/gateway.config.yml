@@ -1,5 +1,93 @@
+# http:
+#   port: 8081
+# admin:
+#   port: 9876
+#   host: 0.0.0.0
+# apiEndpoints:
+#   events:
+#     paths: ["/events", "/events/*"]
+#   notifications:
+#     paths: ["/notifications", "/notifications/*", "/SSE"]
+#   users:
+#     paths: ["/users", "/users/*"]
+# serviceEndpoints:
+#   eventService:
+#     url: "http://event-service:3001"
+#   notificationService:
+#     url: "http://notification-service:3002"
+#   userService:
+#     url: "http://user-service:3003"
+# policies:
+#   - basic-auth
+#   - cors
+#   - expression
+#   - key-auth
+#   - log
+#   - oauth2
+#   - proxy
+#   - rate-limit
+#   - jwt
+# pipelines:
+#   events:
+#     apiEndpoints:
+#       - events
+#     policies:
+#       - jwt:
+#           action:
+#             secretOrPublicKey: ${NEXTAUTH_SECRET:"6Ei364MZBXTewjp7AGTCQvQB6IcCQwhfia2s/Xc3gf0="}
+#             tokenLookup:
+#               - header: Authorization
+#             authScheme: Bearer
+#       - proxy:
+#           action:
+#             serviceEndpoint: eventService
+#             changeOrigin: true
+#             prependPath: true
+#             ignorePath: false
+#             stripPath: false
+#             loadBalance:
+#                 type: round-robin
+#   users:
+#     apiEndpoints:
+#       - users
+#     policies:
+#       - jwt:
+#           action:
+#             secretOrPublicKey: ${NEXTAUTH_SECRET:"6Ei364MZBXTewjp7AGTCQvQB6IcCQwhfia2s/Xc3gf0="}
+#             tokenLookup:
+#               - header: Authorization
+#             authScheme: Bearer
+#       - proxy:
+#           action:
+#             serviceEndpoint: userService
+#             changeOrigin: true
+#             prependPath: true
+#             ignorePath: false
+#             stripPath: false
+#             loadBalance:
+#                 type: round-robin
+#   notifications:
+#     apiEndpoints:
+#       - notifications
+#     policies:
+#       - jwt:
+#           action:
+#             secretOrPublicKey: ${NEXTAUTH_SECRET:"6Ei364MZBXTewjp7AGTCQvQB6IcCQwhfia2s/Xc3gf0="}
+#             tokenLookup:
+#               - header: Authorization
+#             authScheme: Bearer
+#       - proxy:
+#           action:
+#             serviceEndpoint: notificationService
+#             changeOrigin: true
+#             prependPath: true
+#             ignorePath: false
+#             stripPath: false
+#             loadBalance:
+#                 type: round-robin
+
 http:
-  port: 8080
+  port: 8081
 admin:
   port: 9876
   host: 0.0.0.0
@@ -7,12 +95,16 @@ apiEndpoints:
   events:
     paths: ["/events", "/events/*"]
   notifications:
-    paths: ["/notifications", "/notifications/*"]
+    paths: ["/notifications", "/notifications/*", "/SSE"]
+  users:
+    paths: ["/users", "/users/*"]
 serviceEndpoints:
   eventService:
     url: "http://event-service:3001"
   notificationService:
     url: "http://notification-service:3002"
+  userService:
+    url: "http://user-service:3003"
 policies:
   - basic-auth
   - cors
@@ -34,6 +126,43 @@ pipelines:
             prependPath: true
             ignorePath: false
             stripPath: false
+            loadBalance:
+                type: round-robin
+      - key-auth:
+        -
+          action:
+            apiKeyHeader: COMPANY-CUSTOM-API-KEY-HEADER
+            disableHeadersScheme: true
+      - rate-limit:
+        -
+          action:
+            max: 10
+            windowMs: 120000
+            rateLimitBy: "${req.ip}"
+  users:
+    apiEndpoints:
+      - users
+    policies:
+      - proxy:
+          action:
+            serviceEndpoint: userService
+            changeOrigin: true
+            prependPath: true
+            ignorePath: false
+            stripPath: false
+            loadBalance:
+                type: round-robin
+      - key-auth:
+        -
+          action:
+            apiKeyHeader: COMPANY-CUSTOM-API-KEY-HEADER
+            disableHeadersScheme: true
+      - rate-limit:
+        -
+          action:
+            max: 10
+            windowMs: 120000
+            rateLimitBy: "${req.ip}"
   notifications:
     apiEndpoints:
       - notifications
@@ -45,3 +174,16 @@ pipelines:
             prependPath: true
             ignorePath: false
             stripPath: false
+            loadBalance:
+                type: round-robin
+      - key-auth:
+        -
+          action:
+            apiKeyHeader: COMPANY-CUSTOM-API-KEY-HEADER
+            disableHeadersScheme: true
+      - rate-limit:
+        -
+          action:
+            max: 10
+            windowMs: 120000
+            rateLimitBy: "${req.ip}"
