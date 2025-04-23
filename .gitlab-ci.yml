@@ -19,9 +19,6 @@ before_script:
 
 build_and_push:
   image: docker:latest
-  services:
-    - name: docker:dind
-      alias: docker
   stage: build_and_push
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
@@ -43,16 +40,6 @@ deploy:
     - echo "Deploying to Kubernetes cluster in namespace $K8S_NAMESPACE..."
     - kubectl config set-context --current --namespace="$K8S_NAMESPACE" # Ensure correct namespace
     - kubectl apply -f .
-
-# test:
-#   stage: test
-#   services:
-#     - docker:dind
-#       alias: docker
-#   script:
-#     - docker-compose up -d # Start your services
-#     - docker-compose exec <service_name> pytest # Replace <service_name> with your service name
-#     - docker-compose down
 
 sonarqube:
   stage: sonarqube
