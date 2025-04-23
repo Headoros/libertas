@@ -55,6 +55,7 @@ deploy:
     - export KUBECONFIG="$HOME/.kube/config"
     - kubectl config view -o jsonpath='{.clusters[*].cluster.server}' 
     - kubectl config set-context YOUR_CONTEXT_NAME
+    - echo "$KUBE_CONFIG" | base64 -d | less
   script:
     - kubectl config use-context YOUR_CONTEXT_NAME
     - kubectl get nodes 
