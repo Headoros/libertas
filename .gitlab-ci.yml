@@ -1,7 +1,7 @@
 stages:
   - build_and_push
-  - sonarqube
   - deploy
+  - sonarqube
 
 variables:
   IMAGE_NAME: "mikeyspikey/test"
@@ -41,6 +41,6 @@ deploy:
 
 sonarqube:
   stage: sonarqube
-  image: sonarqube:7.0-alpine
+  image: sonarqube:lts-alpine
   script:
     - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-custom:9000 -Dsonar.login=$SONAR_TOKEN
