@@ -55,6 +55,7 @@ deploy:
     - export KUBECONFIG="$HOME/.kube/config"
     # Debug step - print cluster endpoint but hide credentials
     - kubectl config view -o jsonpath='{.clusters[*].cluster.server}' 
+    - kubectl config set-context YOUR_CONTEXT_NAME
   script:
     - kubectl config use-context YOUR_CONTEXT_NAME  # Specify which context to use
     - kubectl get nodes  # Verify connectivity to the cluster
