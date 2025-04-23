@@ -10,6 +10,7 @@ variables:
   K8S_NAMESPACE: "default"
   CI_PROJECT_NAME: "Libertas"
   SONAR_TOKEN: "squ_d3b4e6bc3c19fa4c80581093e40405060d6fd551"
+  DOCKER_TLS_CERTDIR: ""
 
 default:
   before_script:
@@ -25,7 +26,6 @@ build_and_push:
   script:
     - docker-compose build
     - docker compose push
-
 
 build_to_dockerhub:
   stage: build_to_dockerhub
