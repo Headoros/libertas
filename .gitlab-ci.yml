@@ -24,6 +24,18 @@ build_and_push:
     - docker info
     - docker-compose build
 
+kubectl:
+  image: bitnami/kubectl:1.29.6
+  script:
+    - kubectl cluster-info
+    - echo "Now you can use kubectl commands you want"
+
+helm:
+  image: alpine/helm:3.15.2
+  script:
+    - helm version
+    - echo "Now you can use helm commands you want"
+
 deploy:
   stage: deploy
   image:
