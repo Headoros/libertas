@@ -41,9 +41,12 @@ build_to_dockerhub:
 
 deploy:
   stage: deploy
+  # image:
+  #   name: alpine/k8s:1.28.0
+  #   entrypoint: ["/bin/sh", "-c"]
   image:
-    name: alpine/k8s:1.28.0
-    entrypoint: ["/bin/sh", "-c"]
+    name: bitnami/kubectl:latest
+    entrypoint: ['']
   before_script:
     - apk add --no-cache yq
     - mkdir -p $HOME/.kube
@@ -54,13 +57,9 @@ deploy:
     - echo "Contents of KUBECONFIG:"
     - cat $HOME/.kube/config
   script:
-    - echo "Deploying to Kubernetes cluster in namespace $K8S_NAMESPACE..."
-    - echo "Available Kubernetes contexts:"
     - kubectl config get-contexts
-    - echo "Attempting to use context docker-desktop"
-    - kubectl config use-context docker-desktop
-    - kubectl config set-context --current --namespace="$K8S_NAMESPACE"
-    - echo "Applying Kubernetes manifests..."
+    - kubectl config use-context path/to/agent/project:agent-name
+    - kubectl get pods
     - kubectl apply -f .
 
 sonarqube:
