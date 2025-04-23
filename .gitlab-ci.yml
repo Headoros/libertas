@@ -4,7 +4,7 @@ stages:
   - sonarqube
 
 variables:
-  IMAGE_NAME: "mikeyspikey/ia-post-service"
+  IMAGE_NAME: "mikeyspikey/test"
   IMAGE_TAG: "$CI_COMMIT_SHA"
   K8S_NAMESPACE: "default"
   DOCKER_HOST: "tcp://docker:2375"
@@ -23,35 +23,40 @@ build:
       alias: docker
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
+    - echo "Building Docker image..."
+    - docker build -t "$IMAGE_NAME:$IMAGE_TAG" . # Add your Docker build command here
+    - docker push "$IMAGE_NAME:$IMAGE_TAG"       # Add your Docker push command here
 
 deploy:
   stage: deploy
   image:
     name: alpine/k8s:1.28.0
     entrypoint: ["/bin/sh", "-c"]
-  services:
-    - name: docker:dind
-      alias: docker
   before_script:
     - apk add --no-cache yq
     - mkdir -p $HOME/.kube
     - echo "$KUBECONFIG_BASE64" | base64 -d > $HOME/.kube/config
     - export KUBECONFIG="$HOME/.kube/config"
   script:
-    - echo "Deploying to Kubernetes cluster..."
+    - echo "Deploying to Kubernetes cluster in namespace $K8S_NAMESPACE..."
+    - kubectl config set-context --current --namespace="$K8S_NAMESPACE" # Ensure correct namespace
     - kubectl apply -f .
 
 # test:
 #   stage: test
+#   services:
+#     - docker:dind
+#       alias: docker
 #   script:
-#     - docker-compose exec <service_name> pytest  # Replace <service_name> with your service name
+#     - docker-compose up -d # Start your services
+#     - docker-compose exec <service_name> pytest # Replace <service_name> with your service name
 #     - docker-compose down
 
 sonarqube:
   stage: sonarqube
   image: sonarsource/sonar-scanner-cli:latest
   variables:
-    SONAR_HOST_URL: "http://localhost:9000"  # Replace with your SonarQube server URL
-    SONAR_LOGIN: $SONAR_TOKEN  # Set this variable in GitLab CI/CD settings
+    SONAR_HOST_URL: "http://localhost:9000" # Replace with your SonarQube server URL
+    SONAR_LOGIN: $SONAR_TOKEN # Set this variable in GitLab CI/CD settings
   script:
     - sonar-scanner
