@@ -5,7 +5,7 @@ pipeline {
     stages {
         stage('SonarQube Analysis') {
             steps {
-                sh 'apk add --no-cache openjdk17 maven' // Install JDK and Maven
+                sh 'su root -c "apk add --no-cache openjdk17 maven"' // Install JDK and Maven
                 withSonarQubeEnv('sonarqube') {
                     sh 'mvn clean package sonar:sonar'
                 }
