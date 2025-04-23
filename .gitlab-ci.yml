@@ -35,19 +35,21 @@ deploy:
     - echo "Deploying to Kubernetes cluster in namespace $K8S_NAMESPACE..."
     - kubectl config get-contexts
     - CONTEXT=$(kubectl config current-context)
-    - echo "Using current context: $CONTEXT"
+    - echo "Using current context $CONTEXT"
     - kubectl config set-context --current --namespace="$K8S_NAMESPACE"
-    - for file in $(find ./k8s -name "*.yaml" -o -name "*.yml" 2>/dev/null || echo ""); do
-    - if [ -f "$file" ]; then
-    - echo "Updating image tags in $file"
-    - sed -i "s|image: $DOCKER_REGISTRY/.*|image: $DOCKER_REGISTRY/\\1:$IMAGE_TAG|g" "$file"
-    - fi
-    - done
+    - |
+      for file in $(find ./k8s -name "*.yaml" -o -name "*.yml" 2>/dev/null || echo ""); do
+        if [ -f "$file" ]; then
+          echo "Updating image tags in $file"
+          sed -i "s|image: $DOCKER_REGISTRY/.*|image: $DOCKER_REGISTRY/\\1:$IMAGE_TAG|g" "$file"
+        fi
+      done
     - kubectl apply -f ./k8s/
-    - for deployment in $(kubectl get deployments -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
-    - echo "Waiting for deployment $deployment to complete..."
-    - kubectl rollout status deployment/$deployment -n $K8S_NAMESPACE --timeout=180s
-    - done
+    - |
+      for deployment in $(kubectl get deployments -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
+        echo "Waiting for deployment $deployment to complete..."
+        kubectl rollout status deployment/$deployment -n $K8S_NAMESPACE --timeout=180s
+      done
   only:
     - master
 
