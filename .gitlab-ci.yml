@@ -48,8 +48,7 @@ deploy:
     name: alpine/k8s:1.28.0
     entrypoint: ["/bin/sh", "-c"]
   services:
-    - name: docker:dind
-      command: ["--host=unix:///var/run/docker.sock"]
+    - docker:20.10-dind
   before_script:
     - apk add --no-cache yq
     - mkdir -p $HOME/.kube
