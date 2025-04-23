@@ -1,7 +1,6 @@
 stages:
   - build_and_push
   - build_to_dockerhub
-  - deploy
   - sonarqube
 
 variables:
