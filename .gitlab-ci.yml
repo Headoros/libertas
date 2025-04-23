@@ -36,6 +36,7 @@ deploy:
     - export KUBECONFIG="$HOME/.kube/config"
   script:
     - echo "Deploying to Kubernetes cluster in namespace $K8S_NAMESPACE..."
+    - kubectl config use-context docker-desktop
     - kubectl config set-context --current --namespace="$K8S_NAMESPACE" # Ensure correct namespace
     - kubectl apply -f .
 
