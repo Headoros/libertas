@@ -26,32 +26,58 @@ build_and_push:
 
 deploy:
   stage: deploy
-  image: bitnami/kubectl:latest
+  image:
+    name: alpine/k8s:1.28.0
+    entrypoint: ["/bin/sh", "-c"]
   before_script:
+    - apk add --no-cache yq
     - mkdir -p $HOME/.kube
     - echo "$KUBECONFIG_BASE64" | base64 -d > $HOME/.kube/config
     - export KUBECONFIG="$HOME/.kube/config"
-  script:
-    - echo "Deploying to Kubernetes cluster in namespace $K8S_NAMESPACE..."
-    - kubectl config get-contexts
-    - CONTEXT=$(kubectl config current-context)
-    - echo "Using current context $CONTEXT"
-    - kubectl config set-context --current --namespace="$K8S_NAMESPACE"
-    - |
-      for file in $(find ./k8s -name "*.yaml" -o -name "*.yml" 2>/dev/null || echo ""); do
-        if [ -f "$file" ]; then
-          echo "Updating image tags in $file"
-          sed -i "s|image: $DOCKER_REGISTRY/.*|image: $DOCKER_REGISTRY/\\1:$IMAGE_TAG|g" "$file"
-        fi
-      done
-    - kubectl apply -f ./k8s/
-    - |
-      for deployment in $(kubectl get deployments -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
-        echo "Waiting for deployment $deployment to complete..."
-        kubectl rollout status deployment/$deployment -n $K8S_NAMESPACE --timeout=180s
-      done
+  script: |
+    echo "Deploying image: ${IMAGE_NAME}:${IMAGE_TAG}"
+
+    # Update image in deployment.yaml
+    if command -v yq >/dev/null 2>&1; then
+      yq -i ".spec.template.spec.containers[0].image = \"${IMAGE_NAME}:${IMAGE_TAG}\"" deployment.yaml
+    else
+      sed -i 's#image:.*#image: '"${IMAGE_NAME}:${IMAGE_TAG}"'#' deployment.yaml
+    fi
+
+    # Apply Kubernetes configs
+    kubectl apply -f deployment.yaml -n "$K8S_NAMESPACE"
+    kubectl apply -f service.yaml -n "$K8S_NAMESPACE"
   only:
-    - master
+    - main
+
+# deploy:
+#   stage: deploy
+#   image: bitnami/kubectl:latest
+#   before_script:
+#     - mkdir -p $HOME/.kube
+#     - echo "$KUBECONFIG_BASE64" | base64 -d > $HOME/.kube/config
+#     - export KUBECONFIG="$HOME/.kube/config"
+#   script:
+#     - echo "Deploying to Kubernetes cluster in namespace $K8S_NAMESPACE..."
+#     - kubectl config get-contexts
+#     - CONTEXT=$(kubectl config current-context)
+#     - echo "Using current context $CONTEXT"
+#     - kubectl config set-context --current --namespace="$K8S_NAMESPACE"
+#     - |
+#       for file in $(find ./k8s -name "*.yaml" -o -name "*.yml" 2>/dev/null || echo ""); do
+#         if [ -f "$file" ]; then
+#           echo "Updating image tags in $file"
+#           sed -i "s|image: $DOCKER_REGISTRY/.*|image: $DOCKER_REGISTRY/\\1:$IMAGE_TAG|g" "$file"
+#         fi
+#       done
+#     - kubectl apply -f ./k8s/
+#     - |
+#       for deployment in $(kubectl get deployments -n $K8S_NAMESPACE -o jsonpath='{.items[*].metadata.name}'); do
+#         echo "Waiting for deployment $deployment to complete..."
+#         kubectl rollout status deployment/$deployment -n $K8S_NAMESPACE --timeout=180s
+#       done
+#   only:
+#     - master
 
 sonarqube:
   stage: sonarqube
