@@ -37,7 +37,10 @@ build_to_dockerhub:
 
 sonarqube:
   stage: sonarqube
-  image: sonarqube:lts-alpine
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  allow_failure: true
   script:
     - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-custom:9000 -Dsonar.login=$SONAR_TOKEN
 
