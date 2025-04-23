@@ -56,11 +56,10 @@ deploy:
     - echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
     - export KUBECONFIG="$HOME/.kube/config"
     - cat $HOME/.kube/config
-  script:
     - kubectl config get-contexts
-    - kubectl config use-context path/to/agent/project:agent-name
-    - kubectl get pods
-    - kubectl apply -f .
+  script:
+    - kubectl get namespaces  # Test connectivity
+    - kubectl apply -f . -n $K8S_NAMESPACE
 
 sonarqube:
   stage: sonarqube
