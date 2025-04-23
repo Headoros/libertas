@@ -18,7 +18,7 @@ before_script:
 
 build_and_push:
   image: docker:latest
-    services:
+  services:
     - name: docker:dind
       alias: docker
   stage: build_and_push
@@ -27,7 +27,7 @@ build_and_push:
   script:
     - docker info
     - docker-compose build
-    
+
 deploy:
   stage: deploy
   image:
