@@ -9,7 +9,7 @@ variables:
   IMAGE_TAG: "$CI_COMMIT_SHA"
   K8S_NAMESPACE: "default"
   CI_PROJECT_NAME: "Libertas"
-  SONAR_TOKEN: "squ_d3b4e6bc3c19fa4c80581093e40405060d6fd551"
+  SONAR_TOKEN: "sqp_e6678326772672d5ab4703f6c0d5377aaf284b03"
   DOCKER_TLS_CERTDIR: ""
 
 build_and_push:
@@ -42,7 +42,7 @@ sonarqube:
     entrypoint: [""]
   allow_failure: true
   script:
-    - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
+    - sonar-scanner -Dsonar.projectKey=I431326_libertas_5e6a7ff3-81a8-42c4-b1bb-2252ede64057 -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
 
 deploy:
   stage: deploy
