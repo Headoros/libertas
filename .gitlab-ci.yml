@@ -1,7 +1,5 @@
 stages:
   - build_and_push
-  - kubectl
-  - helm
   - deploy
   - sonarqube
 
@@ -25,20 +23,6 @@ build_and_push:
   script:
     - docker info
     - docker-compose build
-
-kubectl:
-  stage: kubectl
-  image: bitnami/kubectl:1.29.6
-  script:
-    - kubectl cluster-info
-    - echo "Now you can use kubectl commands you want"
-
-helm:
-  stage: helm
-  image: alpine/helm:3.15.2
-  script:
-    - helm version
-    - echo "Now you can use helm commands you want"
 
 deploy:
   stage: deploy
