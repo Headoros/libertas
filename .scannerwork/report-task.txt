@@ -1,0 +1,6 @@
+projectKey=I431326_libertas_5e6a7ff3-81a8-42c4-b1bb-2252ede64057
+serverUrl=http://localhost:9000
+serverVersion=10.6.0.92116
+dashboardUrl=http://localhost:9000/dashboard?id=I431326_libertas_5e6a7ff3-81a8-42c4-b1bb-2252ede64057
+ceTaskId=4fc81a9c-6fdf-465a-b61e-cb358955aa3c
+ceTaskUrl=http://localhost:9000/api/ce/task?id=4fc81a9c-6fdf-465a-b61e-cb358955aa3c
