@@ -1,7 +1,7 @@
 stages:
   - build_and_push
-  - deploy
   - sonarqube
+  - deploy
 
 variables:
   IMAGE_NAME: "mikeyspikey/test"
