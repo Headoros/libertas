@@ -41,6 +41,6 @@ deploy:
 
 sonarqube:
   stage: sonarqube
-  image: sonarsource/sonar-scanner-cli:latest
+  image: sonarqube:7.0-alpine
   script:
     - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-custom:9000 -Dsonar.login=$SONAR_TOKEN
