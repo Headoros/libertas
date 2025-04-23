@@ -7,13 +7,13 @@ pipeline {
         }
     }
     stages {
+        stage('SCM') {
+            checkout scm
+        }
         stage('SonarQube Analysis') {
-            steps {
-                sh 'apk add --no-cache openjdk17 maven'
-                sh 'apk info openjdk17 maven' // Optional: Verify installation
-                withSonarQubeEnv('sonarqube') {
-                    sh 'mvn clean package sonar:sonar'
-                }
+            def scannerHome = tool 'SonarScanner';
+            withSonarQubeEnv() {
+            sh "${scannerHome}/bin/sonar-scanner"
             }
         }
         stage('Compile') {
