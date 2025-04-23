@@ -2,6 +2,7 @@ stages:
   - build_and_push
   - build_to_dockerhub
   - sonarqube
+  - deploy
 
 variables:
   IMAGE_NAME: "mikeyspikey/test"
@@ -38,6 +39,12 @@ build_to_dockerhub:
   only:
     - master
 
+sonarqube:
+  stage: sonarqube
+  image: sonarqube:lts-alpine
+  script:
+    - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-custom:9000 -Dsonar.login=$SONAR_TOKEN
+
 deploy:
   stage: deploy
   image: alpine/k8s:1.28.0
@@ -55,9 +62,3 @@ deploy:
     - kubectl apply -f . -n $K8S_NAMESPACE
   environment:
     name: production
-
-sonarqube:
-  stage: sonarqube
-  image: sonarqube:lts-alpine
-  script:
-    - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-custom:9000 -Dsonar.login=$SONAR_TOKEN
