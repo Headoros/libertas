@@ -41,22 +41,21 @@ build_to_dockerhub:
 
 deploy:
   stage: deploy
-  # image:
-  #   name: alpine/k8s:1.28.0
-  #   entrypoint: ["/bin/sh", "-c"]
-  image:
-    name: alpine/k8s:1.28.0
-    entrypoint: ["/bin/sh", "-c"]
+  image: alpine/k8s:1.28.0
   before_script:
     - apk add --no-cache yq
     - mkdir -p $HOME/.kube
     - echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
+    - chmod 600 $HOME/.kube/config  # Proper permissions to avoid warnings
     - export KUBECONFIG="$HOME/.kube/config"
-    - cat $HOME/.kube/config
-    - kubectl config get-contexts
+    # Debug step - print cluster endpoint but hide credentials
+    - kubectl config view -o jsonpath='{.clusters[*].cluster.server}' 
   script:
-    - kubectl get namespaces  # Test connectivity
+    - kubectl config use-context YOUR_CONTEXT_NAME  # Specify which context to use
+    - kubectl get nodes  # Verify connectivity to the cluster
     - kubectl apply -f . -n $K8S_NAMESPACE
+  environment:
+    name: production
 
 sonarqube:
   stage: sonarqube
