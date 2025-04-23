@@ -45,16 +45,16 @@ deploy:
   #   name: alpine/k8s:1.28.0
   #   entrypoint: ["/bin/sh", "-c"]
   image:
-    name: bitnami/kubectl:latest
-    entrypoint: ['']
+    name: alpine/k8s:1.28.0
+    entrypoint: ["/bin/sh", "-c"]
+  services:
+    - name: docker:dind
+      command: ["--host=unix:///var/run/docker.sock"]
   before_script:
     - apk add --no-cache yq
     - mkdir -p $HOME/.kube
-    - echo "Decoding KUBECONFIG..."
-    - echo "$KUBECONFIG_BASE64" | base64 -d > $HOME/.kube/config
+    - echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
     - export KUBECONFIG="$HOME/.kube/config"
-    - echo "KUBECONFIG file created at $HOME/.kube/config"
-    - echo "Contents of KUBECONFIG:"
     - cat $HOME/.kube/config
   script:
     - kubectl config get-contexts
