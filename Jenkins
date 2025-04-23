@@ -1,8 +1,9 @@
 pipeline {
-    agent any 
+    // agent any 
     // agent {
     //     docker { image 'node:22.14.0-alpine3.21' }
     // }
+    agent none
     stages {
         stage('SonarQube Analysis') {
             steps {
