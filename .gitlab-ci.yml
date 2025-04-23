@@ -50,8 +50,8 @@ deploy:
   only:
     - main
 
-# deploy:
-#   stage: deploy
+# deploy2:
+#   stage: deploy2
 #   image: bitnami/kubectl:latest
 #   before_script:
 #     - mkdir -p $HOME/.kube
