@@ -16,7 +16,10 @@ before_script:
 
 build:
   stage: build
+  services:
+    - docker:20.10-dind
   script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
     - docker-compose up -d --build
     - docker-compose ps
 
