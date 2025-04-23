@@ -4,9 +4,12 @@ pipeline {
     //     docker { image 'node:22.14.0-alpine3.21' }
     // }
     stages {
-        stage('Static Analysis') {
+        stage('SonarQube Analysis') {
             steps {
-                echo 'Run the static analysis to the code' 
+                withSonarQubeEnv('ServerNameSonar') {
+                    bat '''mvn clean verify sonar:sonar -Dsonar.projectKey=ProjectNameSonar -Dsonar.projectName='ProjectNameSonar' -Dsonar.host.url=http://localhost:9000''' //port 9000 is default for sonar
+                    echo 'SonarQube Analysis Completed'
+                }
             }
         }
         stage('Compile') {
