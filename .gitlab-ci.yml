@@ -42,7 +42,7 @@ sonarqube:
     entrypoint: [""]
   allow_failure: true
   script:
-    - sonar-scanner -Dsonar.projectKey=I431326_libertas_5e6a7ff3-81a8-42c4-b1bb-2252ede64057 -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
+    - sonar-scanner -Dsonar.projectKey=I431326_libertas_5e6a7ff3-81a8-42c4-b1bb-2252ede64057 -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-custom:9000 -Dsonar.login=$SONAR_TOKEN
 
 deploy:
   stage: deploy
