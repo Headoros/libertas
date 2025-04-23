@@ -5,12 +5,12 @@ metadata:
     kompose.cmd: C:\Users\djmik\Desktop\Individueel\Libertas\Services\kompose.exe convert
     kompose.version: 1.34.0 (cbf2835db)
   labels:
-    io.kompose.service: event-database
-  name: event-database
+    io.kompose.service: user-database
+  name: user-database
 spec:
   ports:
-    - name: "5432"
-      port: 5432
+    - name: "5434"
+      port: 5434
       targetPort: 5432
   selector:
-    io.kompose.service: event-database
+    io.kompose.service: user-database
