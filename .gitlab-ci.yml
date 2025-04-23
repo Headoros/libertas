@@ -8,6 +8,8 @@ variables:
   IMAGE_TAG: "$CI_COMMIT_SHA"
   K8S_NAMESPACE: "default"
   DOCKER_TLS_CERTDIR: ""
+  CI_PROJECT_NAME: "Libertas"
+  SONAR_TOKEN: "squ_d3b4e6bc3c19fa4c80581093e40405060d6fd551"
 
 services:
   - docker:dind
@@ -55,8 +57,5 @@ deploy:
 sonarqube:
   stage: sonarqube
   image: sonarsource/sonar-scanner-cli:latest
-  variables:
-    SONAR_HOST_URL: "http://localhost:9000" # Replace with your SonarQube server URL
-    SONAR_LOGIN: $SONAR_TOKEN # Set this variable in GitLab CI/CD settings
   script:
-    - sonar-scanner
+    - sonar-scanner -Dsonar.projectKey=$CI_PROJECT_NAME -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-custom:9000 -Dsonar.login=$SONAR_TOKEN

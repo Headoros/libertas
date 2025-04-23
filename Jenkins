@@ -1,20 +1,17 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:22.14.0-alpine3.21'
-            label 'node-agent'
-            args '-u root' // Run the container initially as root
-        }
-    }
+    agent any 
+    // agent {
+    //     docker { image 'node:22.14.0-alpine3.21' }
+    // }
     stages {
-        // stage('SonarQube Analysis') {
-        //     def scannerHome = tool 'SonarScanner';
-        //     steps {
-        //         withSonarQubeEnv("sonarqube") {
-        //         sh "${scannerHome}/bin/sonar-scanner"
-        //         }
-        //     }
-        // }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('ServerNameSonar') {
+                    bat '''mvn clean verify sonar:sonar -Dsonar.projectKey=ProjectNameSonar -Dsonar.projectName='ProjectNameSonar' -Dsonar.host.url=http://localhost:9000''' //port 9000 is default for sonar
+                    echo 'SonarQube Analysis Completed'
+                }
+            }
+        }
         stage('Compile') {
             steps {
                 echo 'Compile the source code' 
@@ -42,7 +39,7 @@ pipeline {
         }
         stage('Deploy to Test Environment') {
             steps {
-                echo 'Deploying to the test environment using Docker Compose!'
+                echo 'Deploying to the test environment using Docker Compose'
                 kubernetesDeploy(configs: "event-database-service.yaml, event-service-service.yaml, gateway-service.yaml, notification-database-service.yaml, notification-service-service.yaml, rabbitmq-service.yaml, user-database-service.yaml, user-service-service.yaml, event-database-deployment.yaml, event-service-deployment.yaml, event-service-cm0-configmap.yaml, gateway-deployment.yaml, gateway-cm0-configmap.yaml, notification-database-deployment.yaml, notification-service-deployment.yaml, notification-service-cm0-configmap.yaml, rabbitmq-deployment.yaml, user-database-deployment.yaml, user-service-deployment.yaml, user-service-cm0-configmap.yaml")
             }
         }
