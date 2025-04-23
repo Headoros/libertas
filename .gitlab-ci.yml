@@ -51,14 +51,13 @@ deploy:
     - apk add --no-cache yq
     - mkdir -p $HOME/.kube
     - echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
-    - chmod 600 $HOME/.kube/config  # Proper permissions to avoid warnings
+    - chmod 600 $HOME/.kube/config
     - export KUBECONFIG="$HOME/.kube/config"
-    # Debug step - print cluster endpoint but hide credentials
     - kubectl config view -o jsonpath='{.clusters[*].cluster.server}' 
     - kubectl config set-context YOUR_CONTEXT_NAME
   script:
-    - kubectl config use-context YOUR_CONTEXT_NAME  # Specify which context to use
-    - kubectl get nodes  # Verify connectivity to the cluster
+    - kubectl config use-context YOUR_CONTEXT_NAME
+    - kubectl get nodes 
     - kubectl apply -f . -n $K8S_NAMESPACE
   environment:
     name: production
