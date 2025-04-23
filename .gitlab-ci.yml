@@ -12,10 +12,6 @@ variables:
   SONAR_TOKEN: "squ_d3b4e6bc3c19fa4c80581093e40405060d6fd551"
   DOCKER_TLS_CERTDIR: ""
 
-default:
-  before_script:
-    - docker info
-
 build_and_push:
   stage: build_and_push
   services:
