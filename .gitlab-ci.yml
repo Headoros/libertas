@@ -16,10 +16,10 @@ before_script:
   - apk add --no-cache docker-compose
 
 build_and_push:
+  stage: build_and_push
   services:
     - docker:dind
   image: docker:latest
-  stage: build_and_push
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
   script:
@@ -27,12 +27,14 @@ build_and_push:
     - docker-compose build
 
 kubectl:
+  stage: kubectl
   image: bitnami/kubectl:1.29.6
   script:
     - kubectl cluster-info
     - echo "Now you can use kubectl commands you want"
 
 helm:
+  stage: helm
   image: alpine/helm:3.15.2
   script:
     - helm version
