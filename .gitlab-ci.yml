@@ -1,5 +1,5 @@
 stages:
-  - build
+  - build_and_push
   - deploy
   - sonarqube
 
@@ -16,17 +16,18 @@ services:
 before_script:
   - apk add --no-cache docker-compose
 
-build:
-  stage: build
-  services:
+build_and_push:
+  image: docker:latest
+    services:
     - name: docker:dind
       alias: docker
+  stage: build_and_push
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin
   script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
-    - echo "Building Docker image..."
-    - docker build -t "$IMAGE_NAME:$IMAGE_TAG" . # Add your Docker build command here
-    - docker push "$IMAGE_NAME:$IMAGE_TAG"       # Add your Docker push command here
-
+    - docker info
+    - docker-compose build
+    
 deploy:
   stage: deploy
   image:
