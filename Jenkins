@@ -37,7 +37,7 @@ pipeline {
         stage('Deploy to Test Environment') {
             steps {
                 echo 'Deploying to the test environment using Docker Compose'
-                sh 'kubectl apply -f .'
+                kubernetesDeploy(configs: "event-database-service.yaml, event-service-service.yaml, gateway-service.yaml, notification-database-service.yaml, notification-service-service.yaml, rabbitmq-service.yaml, user-database-service.yaml, user-service-service.yaml, event-database-deployment.yaml, event-service-deployment.yaml, event-service-cm0-configmap.yaml, gateway-deployment.yaml, gateway-cm0-configmap.yaml, notification-database-deployment.yaml, notification-service-deployment.yaml, notification-service-cm0-configmap.yaml, rabbitmq-deployment.yaml, user-database-deployment.yaml, user-service-deployment.yaml, user-service-cm0-configmap.yaml")
             }
         }
     }
