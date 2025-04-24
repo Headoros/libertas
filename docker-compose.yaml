@@ -3,16 +3,12 @@ services:
     image: mikeyspikey/gateway:latest
     ports:
       - "8081:8081"
-    volumes:
-      - ./Gateway:/app
     command: npm start
   event-service:
     build:
       context: ./EventService
       dockerfile: Dockerfile
     image: mikeyspikey/event-service:latest
-    volumes:
-      - ./EventService:/app
     environment:
       NODE_ENV: development
       DB_HOST: event-database
@@ -33,8 +29,6 @@ services:
         context: ./UserService
         dockerfile: Dockerfile
       image: mikeyspikey/user-service:latest
-      volumes:
-        - ./UserService:/app
       environment:
         NODE_ENV: development
         DB_HOST: user-database
@@ -55,8 +49,6 @@ services:
       context: ./NotificationService
       dockerfile: Dockerfile
     image: mikeyspikey/notification-service:latest
-    volumes:
-      - ./NotificationService:/app
     environment:
       NODE_ENV: development
       DB_HOST: notification-database

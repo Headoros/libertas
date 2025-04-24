@@ -12,8 +12,6 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: user-service
-  strategy:
-    type: Recreate
   template:
     metadata:
       annotations:
@@ -43,11 +41,4 @@ spec:
           ports:
             - containerPort: 3003
               protocol: TCP
-          volumeMounts:
-            - mountPath: /app
-              name: user-service-cm0
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: user-service-cm0
-          name: user-service-cm0

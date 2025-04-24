@@ -12,8 +12,6 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: event-service
-  strategy:
-    type: Recreate
   template:
     metadata:
       annotations:
@@ -43,11 +41,4 @@ spec:
           ports:
             - containerPort: 3001
               protocol: TCP
-          volumeMounts:
-            - mountPath: /app
-              name: event-service-cm0
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: event-service-cm0
-          name: event-service-cm0

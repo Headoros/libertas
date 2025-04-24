@@ -12,8 +12,6 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: gateway
-  strategy:
-    type: Recreate
   template:
     metadata:
       annotations:
@@ -31,11 +29,4 @@ spec:
           ports:
             - containerPort: 8081
               protocol: TCP
-          volumeMounts:
-            - mountPath: /app
-              name: gateway-cm0
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: gateway-cm0
-          name: gateway-cm0
