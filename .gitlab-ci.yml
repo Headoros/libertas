@@ -60,6 +60,7 @@ deploy:
     - kubectl config get-contexts
   script:
     - kubectl config use-context docker-desktop
-    - kubectl apply -f k8s/ -n $K8S_NAMESPACE
+    - kubectl apply -f k8s/first/ -n $K8S_NAMESPACE
+    - kubectl apply -f k8s/second/ -n $K8S_NAMESPACE
   environment:
     name: production
