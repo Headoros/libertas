@@ -59,6 +59,8 @@ deploy:
 
     - yq eval '(.clusters[] | select(.name == "docker-desktop").cluster.server) |= sub("127.0.0.1", "host.docker.internal")' -i ~/.kube/config
 
+    - yq eval '(.clusters[] | select(.name == "docker-desktop").cluster.insecure-skip-tls-verify) = true' -i ~/.kube/config
+
     - kubectl config get-contexts
   script:
     - kubectl config use-context docker-desktop
