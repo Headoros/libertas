@@ -1,12 +1,4 @@
 services:
-  gateway:
-    build:
-      context: ./Gateway
-      dockerfile: Dockerfile
-    image: mikeyspikey/gateway:latest
-    ports:
-      - "8081:8081"
-    command: npm start
   event-service:
     build:
       context: ./EventService
@@ -20,7 +12,6 @@ services:
       DB_NAME: events_db
     command: npm run dev
     depends_on:
-      - gateway
       - rabbitmq
       - event-database
     deploy:
@@ -40,7 +31,6 @@ services:
         DB_NAME: users_db
       command: npm run dev
       depends_on:
-        - gateway
         - rabbitmq
         - user-database
       deploy:
@@ -60,7 +50,6 @@ services:
       DB_NAME: notifications_db
     command: npm run dev
     depends_on:
-      - gateway
       - rabbitmq
       - notification-database
     deploy:
