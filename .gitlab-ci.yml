@@ -49,10 +49,14 @@ deploy:
   image: alpine/k8s:1.28.0
   before_script:
     - apk add --no-cache yq
-    - mkdir -p $HOME/.kube
-    - echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
-    - chmod 600 $HOME/.kube/config
-    - export KUBECONFIG="$HOME/.kube/config"
+    
+    # Install secure files download tool
+    - curl -s https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer | bash    
+    # Make .kube directory and move config file    
+    - mkdir ~/.kube    
+    - mv .secure_files/config ~/.kube    
+    - export KUBECONFIG=~/.kube/config
+
     - kubectl config view -o jsonpath='{.clusters[*].cluster.server}' 
     - kubectl config set-context YOUR_CONTEXT_NAME
     - echo "$KUBE_CONFIG" | base64 -d | less
