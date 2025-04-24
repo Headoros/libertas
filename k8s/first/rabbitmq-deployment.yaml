@@ -21,7 +21,8 @@ spec:
         io.kompose.service: rabbitmq
     spec:
       containers:
-        - image: rabbitmq
+        - image: rabbitmq:3-management
+          imagePullPolicy: Always
           name: rabbitmq
           ports:
             - containerPort: 5672
