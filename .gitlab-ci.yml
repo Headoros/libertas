@@ -57,9 +57,7 @@ deploy:
     - mv .secure_files/config ~/.kube    
     - export KUBECONFIG=~/.kube/config
 
-    - yq eval '(.clusters[] | select(.name == "docker-desktop").cluster.server) |= sub("127.0.0.1", "host.docker.internal")' -i ~/.kube/config
-
-    - yq eval '(.clusters[] | select(.name == "docker-desktop").cluster.insecure-skip-tls-verify) = true' -i ~/.kube/config
+    - yq eval '(.clusters[] | select(.name == "docker-desktop").cluster.server) |= sub("127.0.0.1", "localhost")' -i ~/.kube/config
 
     - kubectl config get-contexts
   script:
