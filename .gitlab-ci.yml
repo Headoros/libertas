@@ -57,12 +57,9 @@ deploy:
     - mv .secure_files/config ~/.kube    
     - export KUBECONFIG=~/.kube/config
 
-    - yq eval '(.clusters[] | select(.name == "docker-desktop").cluster.server) |= sub("127.0.0.1", "localhost")' -i ~/.kube/config
-
     - kubectl config get-contexts
   script:
     - kubectl config use-context docker-desktop
-    - kubectl get nodes 
     - kubectl apply -f . -n $K8S_NAMESPACE
   environment:
     name: production
