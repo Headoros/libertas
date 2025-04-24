@@ -11,6 +11,6 @@ spec:
   ports:
     - name: "3002"
       port: 3002
-      targetPort: 3002
+      targetPort: 3000
   selector:
     io.kompose.service: notification-service

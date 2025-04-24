@@ -11,6 +11,6 @@ spec:
   ports:
     - name: "3003"
       port: 3003
-      targetPort: 3003
+      targetPort: 3000
   selector:
     io.kompose.service: user-service
