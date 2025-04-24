@@ -58,10 +58,8 @@ deploy:
     - export KUBECONFIG=~/.kube/config
 
     - kubectl config get-contexts
-    - kubectl config set-context YOUR_CONTEXT_NAME
-    - echo "$KUBE_CONFIG" | base64 -d | less
   script:
-    - kubectl config use-context YOUR_CONTEXT_NAME
+    - kubectl config use-context docker-desktop
     - kubectl get nodes 
     - kubectl apply -f . -n $K8S_NAMESPACE
   environment:
