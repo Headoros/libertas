@@ -1,5 +1,7 @@
 const amqp = require('amqplib');
 
+import { createNotification } from '../src/services/notification.service';
+
 const { broadcastEvent } = require('../src/services/SSE.service');
 
 class NotificationMessageConsumer {
@@ -44,41 +46,30 @@ class NotificationMessageConsumer {
         );
     }
 
-    handleMessage(message) {
+    async handleMessage(message) {
         const { eventName, eventData } = message;
 
         switch (eventName) {
             case 'event.created':
-                console.log(`Notification: New event created - ${eventData.name}`);
-                this.sendEventCreatedNotification(eventData);
+                try {
+                    const notification = await createNotification(eventData);
 
-                broadcastEvent(eventData);
+                    broadcastEvent(notification);
+                } catch (error) {
+                    console.error(error);
+                }
 
                 break;
             case 'event.updated':
                 console.log(`Notification: Event updated - ${eventData.name}`);
-                this.sendEventUpdatedNotification(eventData);
                 break;
             case 'user.registered':
                 console.log(`Notification: New user registered - ${eventData.userId}`);
-                this.sendUserRegisteredNotification(eventData);
                 break;
             default:
                 console.log(`Received unknown event: ${eventName}`);
                 break;
         }
-    }
-
-    sendEventCreatedNotification(eventData) {
-        console.log(`Sending notification for event creation: ${eventData.name}`);
-    }
-
-    sendEventUpdatedNotification(eventData) {
-        console.log(`Sending notification for event update: ${eventData.name}`);
-    }
-
-    sendUserRegisteredNotification(eventData) {
-        console.log(`Sending notification for user registration: ${eventData.userId}`);
     }
 
     async close() {

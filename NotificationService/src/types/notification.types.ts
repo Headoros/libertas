@@ -1,4 +1,4 @@
-export interface EventAttributes {
+export interface NotificationAttributes {
     id?: number;
     type: string;
     payload: string;

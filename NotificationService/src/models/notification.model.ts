@@ -1,8 +1,8 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../database';
-import { EventAttributes } from '../types/event.types';
+import { NotificationAttributes } from '../types/notification.types';
 
-class Event extends Model<EventAttributes> implements EventAttributes {
+class Notification extends Model<NotificationAttributes> implements NotificationAttributes {
     public id!: number;
     public type!: string;
     public payload!: string;
@@ -12,7 +12,7 @@ class Event extends Model<EventAttributes> implements EventAttributes {
     public readonly updatedAt!: Date;
 }
 
-Event.init(
+Notification.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -35,8 +35,8 @@ Event.init(
     },
     {
         sequelize,
-        tableName: 'events',
+        tableName: 'notifications',
     }
 );
 
-export default Event;
+export default Notification;

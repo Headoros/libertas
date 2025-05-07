@@ -8,35 +8,31 @@ spec:
   - name: mike-gateway
     namespace: gateway
   rules:
-    # Rule for events paths (/events, /events/*)
     - matches:
       - path:
           type: PathPrefix
           value: "/events"
       backendRefs:
       - name: event-service
-        port: 3001 # Port is present
-    # Rule for notifications paths (/notifications, /notifications/*)
+        port: 3001
     - matches:
       - path:
           type: PathPrefix
           value: "/notifications"
       backendRefs:
       - name: notification-service
-        port: 3002 # Port is present
-    # Rule for /SSE path
+        port: 3002
     - matches:
       - path:
           type: PathPrefix
           value: "/SSE"
       backendRefs:
       - name: notification-service
-        port: 3002 # Port is present
-    # Rule for users paths (/users, /users/*) - THIS IS WHERE THE ERROR WAS
+        port: 3002
     - matches:
       - path:
           type: PathPrefix
           value: "/users"
       backendRefs:
       - name: user-service
-        port: 3000 # <-- Added the missing port here!
+        port: 3000
