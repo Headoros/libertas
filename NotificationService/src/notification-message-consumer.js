@@ -1,8 +1,8 @@
 const amqp = require('amqplib');
 
-import { createNotification } from '../src/services/notification.service';
+import { createNotification } from './services/notification.service';
 
-const { broadcastEvent } = require('../src/services/SSE.service');
+const { broadcastEvent } = require('./services/SSE.service');
 
 class NotificationMessageConsumer {
     constructor(rabbitmqUrl) {
