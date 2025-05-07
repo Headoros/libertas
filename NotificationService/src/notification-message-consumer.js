@@ -1,6 +1,6 @@
 const amqp = require('amqplib');
 
-import { createNotification } from './services/notification.service';
+const { createNotification } = require('./services/notification.service');
 
 const { broadcastEvent } = require('./services/SSE.service');
 
