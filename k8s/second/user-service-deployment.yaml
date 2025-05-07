@@ -37,6 +37,7 @@ spec:
             - name: NODE_ENV
               value: development
           image: mikeyspikey/user-service:latest
+          imagePullPolicy: Always
           name: user-service
           ports:
             - containerPort: 3003

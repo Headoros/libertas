@@ -37,6 +37,7 @@ spec:
             - name: NODE_ENV
               value: development
           image: mikeyspikey/notification-service:latest
+          imagePullPolicy: Always
           name: notification-service
           ports:
             - containerPort: 3002

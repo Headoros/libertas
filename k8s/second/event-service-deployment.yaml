@@ -37,6 +37,7 @@ spec:
             - name: NODE_ENV
               value: development
           image: mikeyspikey/event-service:latest
+          imagePullPolicy: Always
           name: event-service
           ports:
             - containerPort: 3001
