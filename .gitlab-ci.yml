@@ -12,7 +12,7 @@ variables:
   SONAR_TOKEN: "sqp_e6678326772672d5ab4703f6c0d5377aaf284b03"
   DOCKER_TLS_CERTDIR: ""
 
-build_and_push:
+build_to_dockerdesktop:
   stage: build
   services:
     - docker:dind
@@ -44,21 +44,16 @@ sonarqube:
   script:
     - sonar-scanner -Dsonar.projectKey=I431326_libertas_5e6a7ff3-81a8-42c4-b1bb-2252ede64057 -Dsonar.sources=. -Dsonar.host.url=http://172.17.0.4:9000 -Dsonar.login=$SONAR_TOKEN
 
-# test:
-#   stage: test
-#   image: node:latest # Or a specific Node.js version
-#   services:
-#     - docker:dind
-#   variables:
-#     DOCKER_HOST: tcp://docker:2375 # Required for Docker-in-Docker
-#   before_script:
-#     - cd EventService
-#     - npm install
-#   script:
-#     - cd services # Navigate into the services directory
-#     - find -maxdepth 1 -type d -exec sh -c 'cd "$1" && npm test' _ {} \; # Run tests in each service
-#   after_script:
-#     - docker-compose -f docker-compose.test.yml down
+test:
+  stage: test
+  image: node:latest
+  services:
+    - docker:dind
+  before_script:
+    - cd EventService
+    - npm install
+  script:
+    - find -maxdepth 1 -type d -exec sh -c 'cd "$1" && npm test' _ {} \;
 
 deploy_cloud:
   stage: deploy
