@@ -1,6 +1,6 @@
-const express = require('express');
+import express, { Request, Response } from 'express';
 
-const EventMessageBus = require('./event-message-bus');
+import EventMessageBus from './event-message-bus';
 
 const app = express();
 app.use(express.json());
@@ -12,7 +12,7 @@ async function startService() {
     try {
         await messageBus.connect();
 
-        app.post('/events', async (req, res) => {
+        app.post('/events', async (req: Request, res: Response) => {
             const { eventName, eventData } = req.body;
 
             try {

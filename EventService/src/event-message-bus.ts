@@ -1,16 +1,21 @@
-const amqp = require('amqplib');
+import { ChannelModel, Channel, connect } from 'amqplib';
 
 class EventMessageBus {
-    constructor(rabbitmqUrl) {
+    private rabbitmqUrl: string;
+    private connection: ChannelModel | null;
+    private channel: Channel | null;
+    private exchangeName: string;
+
+    constructor(rabbitmqUrl: string) {
         this.rabbitmqUrl = rabbitmqUrl;
         this.connection = null;
         this.channel = null;
         this.exchangeName = 'events';
     }
 
-    async connect() {
+    async connect(): Promise<void> {
         try {
-            this.connection = await amqp.connect(this.rabbitmqUrl);
+            this.connection = await connect(this.rabbitmqUrl);
             this.channel = await this.connection.createChannel();
             await this.channel.assertExchange(this.exchangeName, 'fanout', { durable: false });
             console.log('Connected to RabbitMQ');
@@ -20,7 +25,7 @@ class EventMessageBus {
         }
     }
 
-    async publishEvent(eventName, eventData) {
+    async publishEvent(eventName: string, eventData: any): Promise<void> {
         if (!this.channel) {
             throw new Error('RabbitMQ channel not initialized. Call connect() first.');
         }
@@ -30,12 +35,14 @@ class EventMessageBus {
         console.log(`Published event: ${eventName}`);
     }
 
-    async close() {
+    async close(): Promise<void> {
         if (this.connection) {
             await this.connection.close();
+            this.connection = null;
+            this.channel = null;
             console.log('RabbitMQ connection closed');
         }
     }
 }
 
-module.exports = EventMessageBus;
+export = EventMessageBus;
