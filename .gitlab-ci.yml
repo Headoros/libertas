@@ -2,6 +2,7 @@ stages:
   - build_and_push
   - build_to_dockerhub
   - sonarqube
+  - test
   - deploy
 
 variables:
@@ -43,6 +44,45 @@ sonarqube:
   allow_failure: true
   script:
     - sonar-scanner -Dsonar.projectKey=I431326_libertas_5e6a7ff3-81a8-42c4-b1bb-2252ede64057 -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-custom:9000 -Dsonar.login=$SONAR_TOKEN
+
+# test:
+#   stage: test
+#   image: node:latest # Or a specific Node.js version
+#   services:
+#     - docker:dind
+#   variables:
+#     DOCKER_HOST: tcp://docker:2375 # Required for Docker-in-Docker
+#   before_script:
+#     - cd EventService
+#     - npm install
+#   script:
+#     - cd services # Navigate into the services directory
+#     - find -maxdepth 1 -type d -exec sh -c 'cd "$1" && npm test' _ {} \; # Run tests in each service
+#   after_script:
+#     - docker-compose -f docker-compose.test.yml down
+
+deploy_cloud:
+  stage: deploy
+  image: alpine/k8s:1.28.0
+  before_script:
+    - apk add --no-cache yq
+
+    # Install secure files download tool
+    - curl -s https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer | bash    
+    # Make .kube directory and move config file    
+    - mkdir ~/.kube    
+    - mv .secure_files/k8s-1-32-2-do-1-ams3-1747036125654-kubeconfig.yaml ~/.kube    
+    - export KUBECONFIG=~/.kube/k8s-1-32-2-do-1-ams3-1747036125654-kubeconfig.yaml
+
+    - kubectl config get-contexts
+  script:
+    - kubectl config use-context docker-desktop
+    - kubectl delete -f k8s/first/
+    - kubectl delete -f k8s/second/
+    - kubectl apply -f k8s/first/ -n $K8S_NAMESPACE
+    - kubectl apply -f k8s/second/ -n $K8S_NAMESPACE
+  environment:
+    name: production
 
 deploy:
   stage: deploy
