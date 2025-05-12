@@ -77,8 +77,8 @@ deploy_cloud:
     - kubectl config get-contexts
   script:
     - kubectl config use-context do-ams3-k8s-1-32-2-do-1-ams3-1747036125654
-    - kubectl delete -f k8s/first/
-    - kubectl delete -f k8s/second/
+    # - kubectl delete -f k8s/first/
+    # - kubectl delete -f k8s/second/
     - kubectl apply -f k8s/first/ -n $K8S_NAMESPACE
     - kubectl apply -f k8s/second/ -n $K8S_NAMESPACE
   environment:
